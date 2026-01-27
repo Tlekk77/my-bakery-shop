@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bakery Shop - สั่งขนมง่ายๆ</title>
-    <script src="https://cdn.tailwindcss.com"></script> </head>
+    <title>Bakery Shop - สั่งขนม</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
 <body class="bg-orange-50 p-5">
     <div class="max-w-md mx-auto bg-white rounded-2xl shadow-lg p-6">
         <h1 class="text-2xl font-bold text-orange-600 mb-4 text-center">🍪 สั่งขนมออนไลน์</h1>
@@ -12,7 +13,7 @@
         <div class="space-y-4">
             <div>
                 <label class="block text-sm font-medium">ชื่อ-นามสกุล</label>
-                <input type="text" id="name" class="w-full border p-2 rounded-lg">
+                <input type="text" id="name" class="w-full border p-2 rounded-lg" placeholder="ระบุชื่อของคุณ">
             </div>
 
             <div>
@@ -25,13 +26,13 @@
             </div>
 
             <div class="bg-gray-100 p-3 rounded-lg text-center">
-                <p class="text-xs text-gray-500">สแกนจ่ายที่นี่ (รูป QR Code ของคุณ)</p>
-                <div class="w-32 h-32 bg-gray-300 mx-auto my-2">QR</div>
+                <p class="text-xs text-gray-500 mb-2">สแกนจ่ายที่นี่</p>
+                <img src="https://via.placeholder.com/150?text=Your+QR+Code" class="mx-auto w-32 h-32">
             </div>
 
             <div>
                 <label class="block text-sm font-medium">แนบสลิปโอนเงิน</label>
-                <input type="file" id="slip" accept="image/*" class="w-full text-sm">
+                <input type="file" id="slip" accept="image/*" class="w-full text-sm mt-1">
             </div>
 
             <button onclick="sendData()" id="btn" class="w-full bg-orange-500 text-white py-3 rounded-xl font-bold hover:bg-orange-600 transition">
@@ -47,10 +48,10 @@
             const name = document.getElementById('name').value;
             const order = document.getElementById('order').value;
             
-            if(!name || !fileInput.files[0]) return alert("กรุณากรอกข้อมูลและแนบสลิปครับ");
+            if(!name || !fileInput.files[0]) return alert("กรุณากรอกชื่อและแนบสลิปด้วยครับ");
 
             btn.disabled = true;
-            btn.innerText = "กำลังส่งข้อมูล...";
+            btn.innerText = "กำลังส่งออเดอร์...";
 
             const file = fileInput.files[0];
             const reader = new FileReader();
@@ -58,26 +59,29 @@
             
             reader.onload = async function() {
                 const base64Data = reader.result;
-                const url = 'https://script.google.com/macros/s/AKfycbxA_LAZpDXnS7PY_Q24OT60ahWw_jib1E3SAXQFAfIH7P8Q4ZCL3OOQpDr6uY89GYHn9Q/exec'; // <--- วาง URL ตรงนี้
+                
+                // *** วางลิงก์สีฟ้าจากรูปที่ 4 ของคุณลงในเครื่องหมายคำพูดด้านล่างนี้ ***
+                const url = 'https://script.google.com/macros/s/AKfycbxA_LAZpDXnS7PY_Q24OT60ahWw_jib1E3SAXQFAflH7P8Q4ZCL3OOQpDr6uY89GYHn9Q/exec';
 
                 const formData = new URLSearchParams();
                 formData.append('name', name);
                 formData.append('order', order);
-                formData.append('price', order.match(/\d+/)[0]); // ดึงตัวเลขราคาออกมา
+                formData.append('price', order.match(/\d+/)[0]); 
                 formData.append('file', base64Data);
                 formData.append('filename', file.name);
 
                 try {
-                    // ส่งแบบ no-cors สำหรับ Google Apps Script
+                    // ใช้ mode: 'no-cors' สำหรับส่งไป Google Apps Script
                     await fetch(url, { method: 'POST', body: formData, mode: 'no-cors' });
-                    alert("ออเดอร์ถูกส่งแล้ว! บอทจะแจ้งเตือนเจ้าของร้านทันที");
+                    alert("ส่งออเดอร์เรียบร้อยแล้ว! ขอบคุณที่อุดหนุนครับ");
                     location.reload();
                 } catch (e) {
                     alert("เกิดข้อผิดพลาด: " + e.message);
                     btn.disabled = false;
+                    btn.innerText = "ยืนยันการสั่งซื้อ";
                 }
             };
         }
     </script>
 </body>
-</html>ดด
+</html>
