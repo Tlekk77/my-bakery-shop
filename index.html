@@ -3,55 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bakery Shop - สั่งขนม</title>
+    <title>ร้านขนมออนไลน์</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-orange-50 p-5">
-    <div class="max-w-md mx-auto bg-white rounded-2xl shadow-lg p-6">
-        <h1 class="text-2xl font-bold text-orange-600 mb-4 text-center">🍪 สั่งขนมออนไลน์</h1>
+<body class="bg-pink-50 min-h-screen p-5 flex items-center justify-center">
+    <div class="max-w-md w-full bg-white rounded-3xl shadow-xl p-8 border-4 border-pink-200">
+        <h1 class="text-3xl font-bold text-pink-600 mb-6 text-center">🍪 สั่งขนมร้านเรา</h1>
         
-        <div class="space-y-4">
+        <div class="space-y-5">
             <div>
-                <label class="block text-sm font-medium">ชื่อ-นามสกุล</label>
-                <input type="text" id="name" class="w-full border p-2 rounded-lg" placeholder="ระบุชื่อของคุณ">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">ชื่อลูกค้า:</label>
+                <input type="text" id="name" class="w-full border-2 border-pink-100 p-3 rounded-xl focus:outline-none focus:border-pink-400">
             </div>
 
             <div>
-                <label class="block text-sm font-medium">เลือกเมนูขนม</label>
-                <select id="order" class="w-full border p-2 rounded-lg">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">เลือกความอร่อย:</label>
+                <select id="order" class="w-full border-2 border-pink-100 p-3 rounded-xl">
                     <option value="บราวนี่หนึบ (50.-)">บราวนี่หนึบ (50.-)</option>
                     <option value="เค้กไข่ไต้หวัน (120.-)">เค้กไข่ไต้หวัน (120.-)</option>
                     <option value="คุ๊กกี้เนยสด (180.-)">คุ๊กกี้เนยสด (180.-)</option>
                 </select>
             </div>
 
-            <div class="bg-gray-100 p-3 rounded-lg text-center">
-                <p class="text-xs text-gray-500 mb-2">สแกนจ่ายที่นี่</p>
-                <img src="https://via.placeholder.com/150?text=Your+QR+Code" class="mx-auto w-32 h-32">
+            <div class="bg-pink-100 p-4 rounded-2xl text-center border-2 border-dashed border-pink-300">
+                <p class="text-sm font-bold text-pink-800">โอนเงินเข้าเบอร์: 08x-xxx-xxxx</p>
+                <p class="text-xs text-pink-600">กรุณาแนบสลิปด้านล่าง</p>
             </div>
 
             <div>
-                <label class="block text-sm font-medium">แนบสลิปโอนเงิน</label>
-                <input type="file" id="slip" accept="image/*" class="w-full text-sm mt-1">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">แนบสลิปโอนเงิน:</label>
+                <input type="file" id="slip" accept="image/*" class="w-full text-sm">
             </div>
 
-            <button onclick="sendData()" id="btn" class="w-full bg-orange-500 text-white py-3 rounded-xl font-bold hover:bg-orange-600 transition">
+            <button onclick="sendOrder()" id="btn" class="w-full bg-pink-500 text-white py-4 rounded-2xl font-black text-xl hover:bg-pink-600 transform transition active:scale-95 shadow-lg">
                 ยืนยันการสั่งซื้อ
             </button>
         </div>
     </div>
 
     <script>
-        async function sendData() {
+        async function sendOrder() {
             const btn = document.getElementById('btn');
             const fileInput = document.getElementById('slip');
             const name = document.getElementById('name').value;
             const order = document.getElementById('order').value;
             
-            if(!name || !fileInput.files[0]) return alert("กรุณากรอกชื่อและแนบสลิปด้วยครับ");
+            if(!name || !fileInput.files[0]) return alert("กรุณาใส่ชื่อและแนบสลิปด้วยนะคะ");
 
             btn.disabled = true;
-            btn.innerText = "กำลังส่งออเดอร์...";
+            btn.innerText = "กำลังสร้างรหัสรับของ...";
 
             const file = fileInput.files[0];
             const reader = new FileReader();
@@ -59,26 +59,26 @@
             
             reader.onload = async function() {
                 const base64Data = reader.result;
-                
-                // *** วางลิงก์สีฟ้าจากรูปที่ 4 ของคุณลงในเครื่องหมายคำพูดด้านล่างนี้ ***
-                const url = 'https://script.google.com/macros/s/AKfycbxA_LAZpDXnS7PY_Q24OT60ahWw_jib1E3SAXQFAflH7P8Q4ZCL3OOQpDr6uY89GYHn9Q/exec';
+                // *** ใส่ URL ของคุณตรงนี้ ***
+                const url = 'https://script.google.com/macros/s/AKfycbxA_LAZpDXnS7PY_Q24OT60ahWw_jib1E3SAXQFAfIH7P8Q4ZCL3OOQpDr6uY89GYHn9Q/exec'; 
 
                 const formData = new URLSearchParams();
                 formData.append('name', name);
                 formData.append('order', order);
-                formData.append('price', order.match(/\d+/)[0]); 
+                formData.append('price', order.match(/\d+/)[0]);
                 formData.append('file', base64Data);
                 formData.append('filename', file.name);
 
                 try {
-                    // ใช้ mode: 'no-cors' สำหรับส่งไป Google Apps Script
-                    await fetch(url, { method: 'POST', body: formData, mode: 'no-cors' });
-                    alert("ส่งออเดอร์เรียบร้อยแล้ว! ขอบคุณที่อุดหนุนครับ");
+                    const response = await fetch(url, { method: 'POST', body: formData, mode: 'no-cors' });
+                    
+                    // เนื่องจาก mode no-cors จะอ่าน response ไม่ได้ 
+                    // เราจะแสดงข้อความให้ลูกค้ารอสักครู่ (หรือเปลี่ยน mode ถ้ามีพื้นฐาน)
+                    alert("✨ สั่งซื้อสำเร็จ! ✨\n\nระบบได้รับออเดอร์แล้ว\nรหัสรับสินค้าจะถูกส่งเข้า Telegram ร้าน\nขอบคุณที่อุดหนุนค่ะ!");
                     location.reload();
                 } catch (e) {
-                    alert("เกิดข้อผิดพลาด: " + e.message);
+                    alert("เกิดข้อผิดพลาด ลองใหม่อีกครั้ง");
                     btn.disabled = false;
-                    btn.innerText = "ยืนยันการสั่งซื้อ";
                 }
             };
         }
