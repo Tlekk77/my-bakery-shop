@@ -3,71 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>สั่งซื้อขนมออนไลน์</title>
+    <title>Bakery Order System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #fcf8f3; font-family: 'Kanit', sans-serif; padding: 20px; }
-        .order-card { border-radius: 20px; border: none; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-        .qr-section { background: #fff; border: 2px solid #eee; padding: 15px; border-radius: 15px; margin-bottom: 20px; }
-        .qr-img { max-width: 250px; border-radius: 10px; }
+        body { background-color: #fff9f0; font-family: 'Kanit', sans-serif; padding: 20px; }
+        .order-card { border-radius: 25px; border: none; box-shadow: 0 15px 35px rgba(0,0,0,0.1); background: white; }
+        .qr-box { background: #f8f9fa; padding: 20px; border-radius: 20px; border: 2px dashed #d4a373; margin-bottom: 20px; }
+        .btn-send { background: #d4a373; color: white; border: none; font-weight: 600; padding: 12px; border-radius: 12px; }
+        .btn-send:hover { background: #bc8a5f; color: white; }
     </style>
 </head>
 <body>
 
-<div class="container" style="max-width: 500px;">
+<div class="container" style="max-width: 480px;">
     <div class="card order-card p-4">
-        <h3 class="text-center mb-4">🍩 สั่งซื้อขนม</h3>
+        <h2 class="text-center mb-4" style="color: #d4a373;">🥖 สั่งซื้อขนม</h2>
         
         <div class="mb-3">
-            <label class="form-label">ชื่อลูกค้า</label>
-            <input type="text" id="customerName" class="form-control" placeholder="ระบุชื่อของคุณ">
+            <label class="form-label">ชื่อ-นามสกุล</label>
+            <input type="text" id="customerName" class="form-control" placeholder="กรอกชื่อของคุณ">
         </div>
 
         <div class="mb-3">
-            <label class="form-label">เลือกรายการสินค้า</label>
+            <label class="form-label">เลือกเมนูขนม</label>
             <select id="productList" class="form-select">
-                <option value="" disabled selected>-- เลือกขนม --</option>
-                <option value="เค้กวานิลลา (80 บาท)">เค้กวานิลลา - 80.-</option>
-                <option value="มาการอง (150 บาท)">มาการอง - 150.-</option>
-                <option value="ครัวซองต์ (65 บาท)">ครัวซองต์ - 65.-</option>
+                <option value="" disabled selected>-- เลือกขนมที่ต้องการ --</option>
+                <option value="ครัวซองต์เนยสด (65 บาท)">ครัวซองต์เนยสด - 65.-</option>
+                <option value="เค้กช็อกโกแลต (120 บาท)">เค้กช็อกโกแลต - 120.-</option>
+                <option value="คุ้กกี้รวมรส (95 บาท)">คุ้กกี้รวมรส - 95.-</option>
             </select>
         </div>
 
-        <div class="qr-section text-center">
-            <p class="mb-2"><b>💰 สแกนจ่ายเงินที่นี่</b></p>
-            <img src="https://scontent.fbkk25-1.fna.fbcdn.net/v/t1.15752-9/621442580_1098768079013655_3719796804853129544_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=9f807c&_nc_ohc=xcnjXQhlweIQ7kNvwFwgirs&_nc_oc=AdlD2LiBhQskafsh8tuH12W0GP8mShIeKOUEZE_3xAUQPHt05jdh_E1GrzPdooweLba0fr5hK8nCZJMpUU1gyQqw&_nc_zt=23&_nc_ht=scontent.fbkk25-1.fna&oh=03_Q7cD4gHlNwgoWfaxwTQMi-X6qVi-MUrDnINnA8k_X5jv_8uGTQ&oe=69AC3B8F" class="qr-img mb-3" alt="PromptPay QR">
-            <div class="p-2 bg-light rounded">
-                ยอดที่ต้องชำระ: <h4 class="d-inline text-primary"><span id="displayPrice">0</span></h4> บาท
-            </div>
+        <div class="qr-box text-center">
+            <p class="mb-2"><b>💰 สแกนชำระเงินที่นี่</b></p>
+            <img src="https://scontent.fbkk25-1.fna.fbcdn.net/v/t1.15752-9/621442580_1098768079013655_3719796804853129544_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=9f807c&_nc_ohc=xcnjXQhlweIQ7kNvwFwgirs&_nc_oc=AdlD2LiBhQskafsh8tuH12W0GP8mShIeKOUEZE_3xAUQPHt05jdh_E1GrzPdooweLba0fr5hK8nCZJMpUU1gyQqw&_nc_zt=23&_nc_ht=scontent.fbkk25-1.fna&oh=03_Q7cD4gHlNwgoWfaxwTQMi-X6qVi-MUrDnINnA8k_X5jv_8uGTQ&oe=69AC3B8F" style="max-width: 220px; border-radius: 10px;">
+            <div class="mt-3 h5">ยอดโอน: <span id="displayPrice" class="text-primary">0</span> บาท</div>
         </div>
 
         <div class="mb-4">
-            <label class="form-label">แนบรูปสลิปโอนเงิน</label>
+            <label class="form-label">แนบสลิปโอนเงิน</label>
             <input type="file" id="slipFile" class="form-control" accept="image/*">
         </div>
 
-        <button onclick="sendOrder()" id="btnSubmit" class="btn btn-primary w-100 py-2">ยืนยันออเดอร์</button>
-        <div id="loading" class="text-center mt-3" style="display:none;">⏳ กำลังบันทึกข้อมูล...</div>
+        <button onclick="sendOrder()" id="btnSubmit" class="btn btn-send w-100">ยืนยันการสั่งซื้อ</button>
+        <div id="loading" class="text-center mt-3" style="display:none;">⏳ กำลังส่งข้อมูล...</div>
     </div>
 </div>
 
 <script>
-    // ปรับราคาตามที่เลือก
+    // URL ที่ได้จากการ Deploy Google Apps Script
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxAWT2urdb_deGh6ezPOv43TsjAS7SOnb1FU6ux2wzNXqUBn7RYhV3sHOqlS5gb1SBpzQ/exec";
+
     document.getElementById('productList').addEventListener('change', function() {
         const price = this.value.match(/\d+/);
-        if(price) document.getElementById('displayPrice').innerText = price[0];
+        document.getElementById('displayPrice').innerText = price ? price[0] : 0;
     });
-
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz6fDbCQJ0CYu1vJ03xXr-egP_w0oZbM4BPhFqBekY5zYBDj0bmN9Eftcn3ClUKT8XlfQ/exec";
 
     async function sendOrder() {
         const name = document.getElementById('customerName').value;
         const product = document.getElementById('productList').value;
         const fileInput = document.getElementById('slipFile');
         const btn = document.getElementById('btnSubmit');
-        
+
         if (!name || !product || !fileInput.files[0]) {
-            alert("กรุณาเลือกสินค้าและแนบสลิปให้ครบถ้วน");
+            alert("กรุณากรอกข้อมูลและแนบสลิปให้ครบถ้วนค่ะ");
             return;
         }
 
@@ -88,11 +88,11 @@
                 const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(data) });
                 const res = await response.json();
                 if (res.result === "success") {
-                    alert("สั่งซื้อสำเร็จ! รหัสออเดอร์ของคุณคือ: " + res.orderId);
+                    alert("บันทึกออเดอร์แล้ว! รหัสของคุณคือ: " + res.orderId);
                     location.reload();
                 }
             } catch (e) {
-                alert("เกิดข้อผิดพลาด กรุณาลองใหม่");
+                alert("เกิดข้อผิดพลาด กรุณาลองใหม่นะคะ");
                 btn.disabled = false;
                 document.getElementById('loading').style.display = 'none';
             }
