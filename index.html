@@ -2,102 +2,231 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bakery Order System</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pool Long Aim Line</title>
     <style>
-        body { background-color: #fff9f0; font-family: 'Kanit', sans-serif; padding: 20px; }
-        .order-card { border-radius: 25px; border: none; box-shadow: 0 15px 35px rgba(0,0,0,0.1); background: white; }
-        .qr-box { background: #f8f9fa; padding: 20px; border-radius: 20px; border: 2px dashed #d4a373; margin-bottom: 20px; }
-        .btn-send { background: #d4a373; color: white; border: none; font-weight: 600; padding: 12px; border-radius: 12px; }
-        .btn-send:hover { background: #bc8a5f; color: white; }
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(13, 17, 23, 0.6);
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            background: rgba(22, 27, 34, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 20px;
+            border-radius: 30px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+        .btn {
+            background: #238636;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-reset {
+            background: #da3633;
+        }
+        .slider-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+        input[type=range] {
+            width: 80px;
+        }
     </style>
 </head>
 <body>
 
-<div class="container" style="max-width: 480px;">
-    <div class="card order-card p-4">
-        <h2 class="text-center mb-4" style="color: #d4a373;">🥖 สั่งซื้อขนม</h2>
-        
-        <div class="mb-3">
-            <label class="form-label">ชื่อ-นามสกุล</label>
-            <input type="text" id="customerName" class="form-control" placeholder="กรอกชื่อของคุณ">
+<div id="container">
+    <canvas id="aimCanvas"></canvas>
+    
+    <div class="controls">
+        <button class="btn btn-reset" onclick="resetPoints()">รีเซ็ตจุด</button>
+        <div class="slider-group">
+            <label>ความใส:</label>
+            <input type="range" id="opacitySlider" min="0.2" max="1" step="0.05" value="0.85">
         </div>
-
-        <div class="mb-3">
-            <label class="form-label">เลือกเมนูขนม</label>
-            <select id="productList" class="form-select">
-                <option value="" disabled selected>-- เลือกขนมที่ต้องการ --</option>
-                <option value="ครัวซองต์เนยสด (65 บาท)">ครัวซองต์เนยสด - 65.-</option>
-                <option value="เค้กช็อกโกแลต (120 บาท)">เค้กช็อกโกแลต - 120.-</option>
-                <option value="คุ้กกี้รวมรส (95 บาท)">คุ้กกี้รวมรส - 95.-</option>
-            </select>
-        </div>
-
-        <div class="qr-box text-center">
-            <p class="mb-2"><b>💰 สแกนชำระเงินที่นี่</b></p>
-            <img src="https://scontent.fbkk25-1.fna.fbcdn.net/v/t1.15752-9/621442580_1098768079013655_3719796804853129544_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=9f807c&_nc_ohc=xcnjXQhlweIQ7kNvwFwgirs&_nc_oc=AdlD2LiBhQskafsh8tuH12W0GP8mShIeKOUEZE_3xAUQPHt05jdh_E1GrzPdooweLba0fr5hK8nCZJMpUU1gyQqw&_nc_zt=23&_nc_ht=scontent.fbkk25-1.fna&oh=03_Q7cD4gHlNwgoWfaxwTQMi-X6qVi-MUrDnINnA8k_X5jv_8uGTQ&oe=69AC3B8F" style="max-width: 220px; border-radius: 10px;">
-            <div class="mt-3 h5">ยอดโอน: <span id="displayPrice" class="text-primary">0</span> บาท</div>
-        </div>
-
-        <div class="mb-4">
-            <label class="form-label">แนบสลิปโอนเงิน</label>
-            <input type="file" id="slipFile" class="form-control" accept="image/*">
-        </div>
-
-        <button onclick="sendOrder()" id="btnSubmit" class="btn btn-send w-100">ยืนยันการสั่งซื้อ</button>
-        <div id="loading" class="text-center mt-3" style="display:none;">⏳ กำลังส่งข้อมูล...</div>
     </div>
 </div>
 
 <script>
-    // URL ที่ได้จากการ Deploy Google Apps Script
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxAWT2urdb_deGh6ezPOv43TsjAS7SOnb1FU6ux2wzNXqUBn7RYhV3sHOqlS5gb1SBpzQ/exec";
+    const canvas = document.getElementById('aimCanvas');
+    const ctx = canvas.getContext('2d');
+    const opacitySlider = document.getElementById('opacitySlider');
 
-    document.getElementById('productList').addEventListener('change', function() {
-        const price = this.value.match(/\d+/);
-        document.getElementById('displayPrice').innerText = price ? price[0] : 0;
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+        draw();
     });
 
-    async function sendOrder() {
-        const name = document.getElementById('customerName').value;
-        const product = document.getElementById('productList').value;
-        const fileInput = document.getElementById('slipFile');
-        const btn = document.getElementById('btnSubmit');
+    // พิกัดจุด 3 จุด (ขาว = ลูกขาว, แดง = ลูกเป้า, เหลือง = หลุม)
+    let points = {
+        cue: { x: width * 0.3, y: height * 0.5, radius: 18, color: '#ffffff', label: 'ลูกขาว' },
+        target: { x: width * 0.6, y: height * 0.4, radius: 18, color: '#ff4d4d', label: 'ลูกเป้า' },
+        pocket: { x: width * 0.85, y: height * 0.2, radius: 15, color: '#ffcc00', label: 'หลุม' }
+    };
 
-        if (!name || !product || !fileInput.files[0]) {
-            alert("กรุณากรอกข้อมูลและแนบสลิปให้ครบถ้วนค่ะ");
-            return;
-        }
+    let activePoint = null;
 
-        btn.disabled = true;
-        document.getElementById('loading').style.display = 'block';
-
-        const reader = new FileReader();
-        reader.readAsDataURL(fileInput.files[0]);
-        reader.onload = async () => {
-            const data = {
-                customerName: name,
-                productList: product,
-                totalPrice: product.match(/\d+/)[0],
-                slipBase64: reader.result
-            };
-
-            try {
-                const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(data) });
-                const res = await response.json();
-                if (res.result === "success") {
-                    alert("บันทึกออเดอร์แล้ว! รหัสของคุณคือ: " + res.orderId);
-                    location.reload();
-                }
-            } catch (e) {
-                alert("เกิดข้อผิดพลาด กรุณาลองใหม่นะคะ");
-                btn.disabled = false;
-                document.getElementById('loading').style.display = 'none';
-            }
+    function getTouchPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return {
+            x: clientX - rect.left,
+            y: clientY - rect.top
         };
     }
+
+    function isInside(pos, pt) {
+        return Math.hypot(pos.x - pt.x, pos.y - pt.y) < pt.radius + 15;
+    }
+
+    function onStart(e) {
+        const pos = getTouchPos(e);
+        for (let key in points) {
+            if (isInside(pos, points[key])) {
+                activePoint = key;
+                break;
+            }
+        }
+    }
+
+    function onMove(e) {
+        if (!activePoint) return;
+        const pos = getTouchPos(e);
+        points[activePoint].x = pos.x;
+        points[activePoint].y = pos.y;
+        draw();
+    }
+
+    function onEnd() {
+        activePoint = null;
+    }
+
+    canvas.addEventListener('mousedown', onStart);
+    canvas.addEventListener('mousemove', onMove);
+    canvas.addEventListener('mouseup', onEnd);
+    canvas.addEventListener('touchstart', onStart);
+    canvas.addEventListener('touchmove', onMove);
+    canvas.addEventListener('touchend', onEnd);
+
+    opacitySlider.addEventListener('input', draw);
+
+    function draw() {
+        ctx.clearRect(0, 0, width, height);
+        ctx.globalAlpha = parseFloat(opacitySlider.value);
+
+        const { cue, target, pocket } = points;
+
+        // 1. คำนวณ Ghost Ball (จุดที่ลูกขาวต้องชนลูกเป้าเพื่อให้ลูกเป้าวิ่งไปหาหลุม)
+        const angleTargetToPocket = Math.atan2(pocket.y - target.y, pocket.x - target.x);
+        const ballRadius = 16; // รัศมีลูกพูลจำลอง
+        
+        // ghost ball จะอยู่ฝั่งตรงข้ามกับหลุม ห่างจากลูกเป้าเท่ากับ 2 เท่าของรัศมี
+        const ghostX = target.x - Math.cos(angleTargetToPocket) * (ballRadius * 2);
+        const ghostY = target.y - Math.sin(angleTargetToPocket) * (ballRadius * 2);
+
+        // 2. วาดเส้นเล็งจากลูกขาว -> Ghost Ball (เส้นแทงลูกขาว)
+        ctx.beginPath();
+        ctx.moveTo(cue.x, cue.y);
+        ctx.lineTo(ghostX, ghostY);
+        ctx.strokeStyle = '#00f2fe';
+        ctx.lineWidth = 3;
+        ctx.setLineDash([6, 6]);
+        ctx.stroke();
+
+        // 3. วาดเส้นยาวต่อจากลูกเป้า -> ทะลุหลุมออกไปสุดหน้าจอ (Aim Line ยาว)
+        const longDist = 2000; // ลากยาวทะลุหน้าจอ
+        const lineEndX = target.x + Math.cos(angleTargetToPocket) * longDist;
+        const lineEndY = target.y + Math.sin(angleTargetToPocket) * longDist;
+
+        ctx.beginPath();
+        ctx.moveTo(target.x, target.y);
+        ctx.lineTo(lineEndX, lineEndY);
+        ctx.strokeStyle = '#39ff14'; // สีเขียวสะท้อนแสง
+        ctx.lineWidth = 4;
+        ctx.setLineDash([]);
+        ctx.stroke();
+
+        // 4. วาด Ghost Ball เสมือน
+        ctx.beginPath();
+        ctx.arc(ghostX, ghostY, ballRadius, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([3, 3]);
+        ctx.stroke();
+
+        // 5. วาดจุดควบคุมทั้ง 3 จุด
+        for (let key in points) {
+            const pt = points[key];
+            ctx.beginPath();
+            ctx.arc(pt.x, pt.y, pt.radius, 0, Math.PI * 2);
+            ctx.fillStyle = pt.color;
+            ctx.shadowColor = pt.color;
+            ctx.shadowBlur = 12;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // ป้ายชื่อจุด
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(pt.label, pt.x, pt.y - pt.radius - 6);
+        }
+    }
+
+    function resetPoints() {
+        points.cue = { x: width * 0.3, y: height * 0.5, radius: 18, color: '#ffffff', label: 'ลูกขาว' };
+        points.target = { x: width * 0.6, y: height * 0.4, radius: 18, color: '#ff4d4d', label: 'ลูกเป้า' };
+        points.pocket = { x: width * 0.85, y: height * 0.2, radius: 15, color: '#ffcc00', label: 'หลุม' };
+        draw();
+    }
+
+    draw();
 </script>
 </body>
 </html>
