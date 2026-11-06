@@ -3,27 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pool Long Aim Line</title>
+    <title>Pool Aim Line Pro</title>
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
         }
         body {
-            background-color: transparent; /* โปร่งใส เพื่อให้มองทะลุเห็นเกมข้างหลัง */
+            background-color: transparent;
             color: #c9d1d9;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             overflow: hidden;
             height: 100vh;
             width: 100vw;
             position: fixed;
+            touch-action: none;
         }
         #container {
             position: relative;
             width: 100vw;
             height: 100vh;
-            touch-action: none; /* ป้องกันการเลื่อนหน้าจอหนีเวลาลากจุด */
         }
         canvas {
             position: absolute;
@@ -35,27 +37,27 @@
         }
         .controls {
             position: absolute;
-            bottom: 30px;
+            bottom: 25px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 10;
-            background: rgba(22, 27, 34, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 10px 20px;
-            border-radius: 30px;
+            background: rgba(22, 27, 34, 0.92);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 12px 22px;
+            border-radius: 35px;
             display: flex;
-            gap: 12px;
+            gap: 15px;
             align-items: center;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
         }
         .btn {
             background: #238636;
             color: #fff;
             border: none;
-            padding: 8px 16px;
+            padding: 10px 18px;
             border-radius: 20px;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
         }
@@ -65,12 +67,12 @@
         .slider-group {
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-size: 12px;
+            gap: 8px;
+            font-size: 13px;
             color: #fff;
         }
         input[type=range] {
-            width: 70px;
+            width: 80px;
         }
     </style>
 </head>
@@ -103,14 +105,14 @@
     });
 
     let points = {
-        cue: { x: width * 0.3, y: height * 0.5, radius: 22, color: '#ffffff', label: 'ลูกขาว' },
-        target: { x: width * 0.6, y: height * 0.4, radius: 22, color: '#ff4d4d', label: 'ลูกเป้า' },
-        pocket: { x: width * 0.85, y: height * 0.2, radius: 20, color: '#ffcc00', label: 'หลุม' }
+        cue: { x: width * 0.3, y: height * 0.6, radius: 35, color: '#ffffff', label: 'ลูกขาว' },
+        target: { x: width * 0.6, y: height * 0.4, radius: 35, color: '#ff4d4d', label: 'ลูกเป้า' },
+        pocket: { x: width * 0.85, y: height * 0.2, radius: 35, color: '#ffcc00', label: 'หลุม' }
     };
 
     let activePoint = null;
 
-    function getTouchPos(e) {
+    function getPos(e) {
         const rect = canvas.getBoundingClientRect();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
@@ -120,14 +122,13 @@
         };
     }
 
-    function isInside(pos, pt) {
-        return Math.hypot(pos.x - pt.x, pos.y - pt.y) < pt.radius + 20; // เพิ่มพื้นที่ให้กดติดง่ายขึ้น
-    }
-
     function onStart(e) {
-        const pos = getTouchPos(e);
+        const pos = getPos(e);
+        // เช็คว่านิ้วแตะโดนจุดไหน (ขยายโซนสัมผัสให้กว้างขึ้นมากๆ เพื่อให้กดติดง่าย)
         for (let key in points) {
-            if (isInside(pos, points[key])) {
+            let pt = points[key];
+            let dist = Math.hypot(pos.x - pt.x, pos.y - pt.y);
+            if (dist < 60) { // รัศมีการกดกว้างถึง 60 พิกเซล จิ้มง่ายแน่นอน
                 activePoint = key;
                 break;
             }
@@ -136,8 +137,8 @@
 
     function onMove(e) {
         if (!activePoint) return;
-        e.preventDefault(); // ป้องกันหน้าจอเลื่อนหน่วงเวลาลากจุด
-        const pos = getTouchPos(e);
+        e.preventDefault();
+        const pos = getPos(e);
         points[activePoint].x = pos.x;
         points[activePoint].y = pos.y;
         draw();
@@ -147,13 +148,14 @@
         activePoint = null;
     }
 
+    // รองรับทั้งเมาส์และนิ้วมือทัชสกรีนแบบเต็มระบบ
     canvas.addEventListener('mousedown', onStart);
-    canvas.addEventListener('mousemove', onMove);
-    canvas.addEventListener('mouseup', onEnd);
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onEnd);
     
     canvas.addEventListener('touchstart', onStart, { passive: false });
-    canvas.addEventListener('touchmove', onMove, { passive: false });
-    canvas.addEventListener('touchend', onEnd);
+    window.addEventListener('touchmove', onMove, { passive: false });
+    window.addEventListener('touchend', onEnd);
 
     opacitySlider.addEventListener('input', draw);
 
@@ -165,12 +167,12 @@
 
         // คำนวณ Ghost Ball
         const angleTargetToPocket = Math.atan2(pocket.y - target.y, pocket.x - target.x);
-        const ballRadius = 18; 
+        const ballRadius = 22; 
         
         const ghostX = target.x - Math.cos(angleTargetToPocket) * (ballRadius * 2);
         const ghostY = target.y - Math.sin(angleTargetToPocket) * (ballRadius * 2);
 
-        // เส้นเล็งลูกขาว -> Ghost Ball
+        // 1. เส้นประลูกขาวไปกระทบลูกเป้า (Ghost Ball)
         ctx.beginPath();
         ctx.moveTo(cue.x, cue.y);
         ctx.lineTo(ghostX, ghostY);
@@ -179,8 +181,8 @@
         ctx.setLineDash([8, 6]);
         ctx.stroke();
 
-        // เส้นยาวต่อจากลูกเป้า -> ทะลุหลุม
-        const longDist = 2500;
+        // 2. เส้นยาวพุ่งทะลุหลุม
+        const longDist = 3000;
         const lineEndX = target.x + Math.cos(angleTargetToPocket) * longDist;
         const lineEndY = target.y + Math.sin(angleTargetToPocket) * longDist;
 
@@ -192,7 +194,7 @@
         ctx.setLineDash([]);
         ctx.stroke();
 
-        // วงกลม Ghost Ball
+        // 3. วงกลม Ghost Ball
         ctx.beginPath();
         ctx.arc(ghostX, ghostY, ballRadius, 0, Math.PI * 2);
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
@@ -200,29 +202,36 @@
         ctx.setLineDash([4, 4]);
         ctx.stroke();
 
-        // วาดจุดลาก
+        // 4. วาดปุ่มวงกลมควบคุม (ทำปุ่มให้ใหญ่สะใจ จิ้มลากง่าย)
         for (let key in points) {
             const pt = points[key];
+            
+            // วงแหวนเรืองแสงรอบนอก
             ctx.beginPath();
             ctx.arc(pt.x, pt.y, pt.radius, 0, Math.PI * 2);
             ctx.fillStyle = pt.color;
-            ctx.shadowColor = '#000';
-            ctx.shadowBlur = 10;
+            ctx.shadowColor = pt.color;
+            ctx.shadowBlur = 15;
             ctx.fill();
             ctx.shadowBlur = 0;
 
-            // ข้อความชื่อจุด
+            // ขอบนอกสีดำตัดขอบให้ชัดเจน
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#000000';
+            ctx.stroke();
+
+            // ตัวหนังสือบอกชื่อ
             ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 13px sans-serif';
+            ctx.font = 'bold 14px sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText(pt.label, pt.x, pt.y - pt.radius - 8);
         }
     }
 
     function resetPoints() {
-        points.cue = { x: width * 0.3, y: height * 0.5, radius: 22, color: '#ffffff', label: 'ลูกขาว' };
-        points.target = { x: width * 0.6, y: height * 0.4, radius: 22, color: '#ff4d4d', label: 'ลูกเป้า' };
-        points.pocket = { x: width * 0.85, y: height * 0.2, radius: 20, color: '#ffcc00', label: 'หลุม' };
+        points.cue = { x: width * 0.3, y: height * 0.6, radius: 35, color: '#ffffff', label: 'ลูกขาว' };
+        points.target = { x: width * 0.6, y: height * 0.4, radius: 35, color: '#ff4d4d', label: 'ลูกเป้า' };
+        points.pocket = { x: width * 0.85, y: height * 0.2, radius: 35, color: '#ffcc00', label: 'หลุม' };
         draw();
     }
 
