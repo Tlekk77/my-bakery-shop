@@ -1,241 +1,684 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="th" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pool Aim Line Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARENA MATCH - สังเวียนหาคู่แข่ง & ล่าเงินรางวัล</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (Kanit & Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#0B0F19',
+                            card: '#151C2C',
+                            border: '#2A354D',
+                            purple: '#7C3AED',
+                            cyan: '#06B6D4',
+                            pink: '#EC4899',
+                            neonGreen: '#10B981',
+                            neonRed: '#EF4444',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Kanit', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-            -webkit-user-select: none;
-        }
         body {
-            background-color: transparent;
-            color: #c9d1d9;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            overflow: hidden;
-            height: 100vh;
-            width: 100vw;
-            position: fixed;
-            touch-action: none;
+            background-color: #0B0F19;
+            color: #F3F4F6;
+            font-family: 'Kanit', sans-serif;
         }
-        #container {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
+        /* Glassmorphism & Glow Effects */
+        .neon-border-purple {
+            box-shadow: 0 0 15px rgba(124, 58, 237, 0.3);
         }
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
+        .neon-border-cyan {
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
         }
-        .controls {
-            position: absolute;
-            bottom: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10;
-            background: rgba(22, 27, 34, 0.92);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            padding: 12px 22px;
-            border-radius: 35px;
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+        .neon-text-cyan {
+            text-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
         }
-        .btn {
-            background: #238636;
-            color: #fff;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 20px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
         }
-        .btn-reset {
-            background: #da3633;
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0B0F19;
         }
-        .slider-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: #fff;
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #2A354D;
+            border-radius: 4px;
         }
-        input[type=range] {
-            width: 80px;
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #7C3AED;
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col justify-between custom-scrollbar bg-[#0B0F19] text-gray-100">
 
-<div id="container">
-    <canvas id="aimCanvas"></canvas>
-    
-    <div class="controls">
-        <button class="btn btn-reset" onclick="resetPoints()">รีเซ็ต</button>
-        <div class="slider-group">
-            <label>ความใส:</label>
-            <input type="range" id="opacitySlider" min="0.2" max="1" step="0.05" value="0.9">
+    <!-- Navbar Header -->
+    <header class="sticky top-0 z-40 bg-[#0B0F19]/90 backdrop-blur-md border-b border-brand-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-brand-purple to-brand-cyan flex items-center justify-center text-2xl font-black shadow-lg shadow-purple-500/30">
+                    <i class="fa-solid fa-gamepad text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-wider bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-500 bg-clip-text text-transparent">
+                        ARENA MATCH
+                    </h1>
+                    <p class="text-xs text-gray-400">ศูนย์รวมการหาคู่แข่ง & สังเวียนประลอง</p>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center space-x-3">
+                <button onclick="openModal('createPostModal')" class="bg-gradient-to-r from-brand-purple to-purple-600 hover:from-purple-600 hover:to-brand-purple text-white px-4 py-2.5 rounded-xl font-medium shadow-lg shadow-purple-900/40 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center space-x-2">
+                    <i class="fa-solid fa-plus-circle text-lg"></i>
+                    <span class="hidden sm:inline">สร้างโพสต์หาคู่แข่ง</span>
+                    <span class="sm:hidden">โพสต์</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+
+        <!-- Hero Banner / Stats -->
+        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-brand-card via-[#1A2338] to-brand-card border border-brand-border p-6 sm:p-10 mb-8 shadow-2xl">
+            <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-brand-purple/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -left-10 -top-10 w-64 h-64 bg-brand-cyan/20 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6">
+                <div class="text-center lg:text-left space-y-2 max-w-2xl">
+                    <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-brand-cyan/10 border border-brand-cyan/30 text-cyan-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                        <span>Live Matchmaking</span>
+                    </div>
+                    <h2 class="text-2xl sm:text-4xl font-extrabold text-white leading-tight">
+                        พร้อมหรือยัง? หาคู่แข่งดวลฝีมือ <br class="hidden sm:inline"/>
+                        <span class="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">วางเดิมพันล่ารางวัลได้ทุกวัน</span>
+                    </h2>
+                    <p class="text-gray-400 text-sm sm:text-base">
+                        ไม่ว่าจะเป็น Game E-Sports (RoV, VALORANT, FC24) หรือกีฬาสังเวียนจริง (ฟุตซอล, แบดมินตัน, มวย) เปิดรับผู้ท้าชิงได้ทันที!
+                    </p>
+                </div>
+
+                <!-- Quick Stats Badge -->
+                <div class="grid grid-cols-3 gap-3 sm:gap-4 w-full lg:w-auto">
+                    <div class="bg-brand-dark/80 backdrop-blur border border-brand-border p-4 rounded-2xl text-center">
+                        <div class="text-xl sm:text-2xl font-black text-cyan-400" id="statTotal">0</div>
+                        <div class="text-xs text-gray-400">แมตช์ทั้งหมด</div>
+                    </div>
+                    <div class="bg-brand-dark/80 backdrop-blur border border-brand-border p-4 rounded-2xl text-center">
+                        <div class="text-xl sm:text-2xl font-black text-emerald-400" id="statOpen">0</div>
+                        <div class="text-xs text-gray-400">เปิดรับท้า</div>
+                    </div>
+                    <div class="bg-brand-dark/80 backdrop-blur border border-brand-border p-4 rounded-2xl text-center">
+                        <div class="text-xl sm:text-2xl font-black text-rose-400" id="statFull">0</div>
+                        <div class="text-xs text-gray-400">ได้คู่แข่งแล้ว</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter & Search Controls -->
+        <div class="bg-brand-card border border-brand-border rounded-2xl p-4 sm:p-5 mb-8 shadow-lg">
+            <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+                
+                <!-- Search Box -->
+                <div class="relative w-full md:w-96">
+                    <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" id="searchInput" oninput="applyFilters()" placeholder="ค้นหาชื่อเกม, กีฬา, หรือชื่อผู้โพสต์..." 
+                        class="w-full pl-11 pr-4 py-2.5 bg-brand-dark border border-brand-border rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan transition-all">
+                </div>
+
+                <!-- Category & Status Filters -->
+                <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                    <!-- Status Filter Tabs -->
+                    <div class="bg-brand-dark p-1 rounded-xl border border-brand-border flex text-xs sm:text-sm font-medium w-full sm:w-auto justify-center">
+                        <button onclick="setStatusFilter('all')" id="btnFilterAll" class="px-4 py-1.5 rounded-lg transition-all bg-brand-purple text-white">ทั้งหมด</button>
+                        <button onclick="setStatusFilter('open')" id="btnFilterOpen" class="px-4 py-1.5 rounded-lg transition-all text-gray-400 hover:text-white">🟢 เปิดรับอยู่</button>
+                        <button onclick="setStatusFilter('full')" id="btnFilterFull" class="px-4 py-1.5 rounded-lg transition-all text-gray-400 hover:text-white">🔴 เต็มแล้ว</button>
+                    </div>
+
+                    <!-- Reset Data Button -->
+                    <button onclick="resetSampleData()" title="รีเซ็ตกลับเป็นข้อมูลตัวอย่าง" class="p-2.5 bg-brand-dark hover:bg-gray-800 border border-brand-border rounded-xl text-gray-400 hover:text-white text-sm transition-all ml-auto md:ml-0">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Post Cards Grid / List -->
+        <div id="postsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Dynamic Post Cards Load Here -->
+        </div>
+
+        <!-- Empty State (Shown when no post matches search) -->
+        <div id="emptyState" class="hidden text-center py-16 bg-brand-card/50 border border-dashed border-brand-border rounded-3xl">
+            <div class="w-16 h-16 bg-gray-800/80 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl text-gray-500">
+                <i class="fa-solid fa-ghost"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-300">ไม่พบแมตช์ที่คุณค้นหา</h3>
+            <p class="text-gray-500 text-sm mt-1">ลองเปลี่ยนคำค้นหา หรือสร้างโพสต์ท้าแข่งใหม่ด้วยตัวเอง!</p>
+            <button onclick="openModal('createPostModal')" class="mt-4 px-4 py-2 bg-brand-purple hover:bg-purple-600 text-white text-sm rounded-xl transition-all">
+                + สร้างโพสต์ใหม่เลย
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-brand-border bg-brand-card/50 py-6 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-gray-500">
+            <p>© 2026 ARENA MATCH. Designed for Gamers & Sports Enthusiasts.</p>
+            <p class="mt-1">สามารถนำไฟล์นี้ไปวางบน GitHub Pages เพื่อเปิดใช้บริการได้ฟรีทันที</p>
+        </div>
+    </footer>
+
+
+    <!-- MODAL 1: Create New Match Post -->
+    <div id="createPostModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-brand-card border border-brand-border rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl relative my-8 my-auto">
+            
+            <!-- Close Button -->
+            <button onclick="closeModal('createPostModal')" class="absolute top-5 right-5 text-gray-400 hover:text-white w-8 h-8 rounded-full bg-brand-dark flex items-center justify-center transition-all">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- Modal Header -->
+            <div class="flex items-center space-x-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-brand-purple/20 border border-brand-purple/40 text-brand-purple flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-bullhorn"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-white">สร้างโพสต์หาคู่แข่ง</h3>
+                    <p class="text-xs text-gray-400">กรอกข้อมูลการท้าแข่งของคุณให้ชัดเจน</p>
+                </div>
+            </div>
+
+            <!-- Form Inputs -->
+            <form id="createPostForm" onsubmit="handleCreatePost(event)" class="space-y-4 text-sm">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Gamer Name -->
+                    <div>
+                        <label class="block text-gray-300 font-medium mb-1.5">ชื่อผู้โพสต์ / Gamertag <span class="text-rose-500">*</span></label>
+                        <input type="text" id="postAuthor" required placeholder="เช่น ProGamer_TH หรือ พี่ตูน" 
+                            class="w-full px-3.5 py-2.5 bg-brand-dark border border-brand-border rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-brand-purple">
+                    </div>
+                    <!-- Game / Sport Name -->
+                    <div>
+                        <label class="block text-gray-300 font-medium mb-1.5">ชื่อเกม / ประเภทกีฬา <span class="text-rose-500">*</span></label>
+                        <input type="text" id="postGame" required placeholder="เช่น RoV, VALORANT, แบดมินตัน" 
+                            class="w-full px-3.5 py-2.5 bg-brand-dark border border-brand-border rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-brand-purple">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Match Mode -->
+                    <div>
+                        <label class="block text-gray-300 font-medium mb-1.5">รูปแบบการแข่ง <span class="text-rose-500">*</span></label>
+                        <select id="postMode" required class="w-full px-3.5 py-2.5 bg-brand-dark border border-brand-border rounded-xl text-white focus:outline-none focus:border-brand-purple">
+                            <option value="1v1 (ดวลเดี่ยว)">1v1 (ดวลเดี่ยว)</option>
+                            <option value="2v2 (ดวลคู่)">2v2 (ดวลคู่)</option>
+                            <option value="5v5 (ทีม)">5v5 (ทีม)</option>
+                            <option value="ปาร์ตี้สายชิล">ปาร์ตี้สายชิล / หาเพื่อนเล่น</option>
+                            <option value="ทัวร์นาเมนต์ / ห้องซ้อม">ทัวร์นาเมนต์ / ห้องซ้อม</option>
+                        </select>
+                    </div>
+                    <!-- Bet / Reward -->
+                    <div>
+                        <label class="block text-gray-300 font-medium mb-1.5">ราคาเดิมพัน / ค่าสนาม / รางวัล <span class="text-rose-500">*</span></label>
+                        <input type="text" id="postReward" required placeholder="เช่น 500 บาท, หารค่าสนาม, เล่นฟรี" 
+                            class="w-full px-3.5 py-2.5 bg-brand-dark border border-brand-border rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-brand-purple">
+                    </div>
+                </div>
+
+                <!-- Opponent Criteria (ลักษณะผู้แข่ง/เวทที่รับ) -->
+                <div>
+                    <label class="block text-gray-300 font-medium mb-1.5">ลักษณะผู้แข่ง / เวทที่รับ <span class="text-rose-500">*</span></label>
+                    <input type="text" id="postCriteria" required placeholder="เช่น แร็งค์ Commander+, น้ำหนักไม่เกิน 70 กก., ไม่จำกัดฝีมือ" 
+                        class="w-full px-3.5 py-2.5 bg-brand-dark border border-brand-border rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-brand-purple">
+                </div>
+
+                <!-- Contact Info -->
+                <div>
+                    <label class="block text-gray-300 font-medium mb-1.5">ช่องทางติดต่อผู้โพสต์ <span class="text-rose-500">*</span></label>
+                    <input type="text" id="postContact" required placeholder="เช่น Discord Tag, Line ID, Facebook หรือ เบอร์โทร" 
+                        class="w-full px-3.5 py-2.5 bg-brand-dark border border-brand-border rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-brand-purple">
+                </div>
+
+                <!-- Extra Details -->
+                <div>
+                    <label class="block text-gray-300 font-medium mb-1.5">รายละเอียดเพิ่มเติม (วัน/เวลา/กติกา)</label>
+                    <textarea id="postDetails" rows="3" placeholder="ระบุกติกาเพิ่มเติม เช่น แข่งคืนนี้ 20:00 น. โหมดสร้างห้อง ห้ามใช้ตัวละครเฉพาะ..." 
+                        class="w-full px-3.5 py-2.5 bg-brand-dark border border-brand-border rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-brand-purple resize-none"></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-2">
+                    <button type="submit" class="w-full py-3 bg-gradient-to-r from-brand-purple to-purple-600 hover:from-purple-600 hover:to-brand-purple text-white font-bold rounded-xl shadow-lg shadow-purple-900/50 transition-all">
+                        🚀 โพสต์ประกาศหาคู่แข่ง
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
-</div>
 
-<script>
-    const canvas = document.getElementById('aimCanvas');
-    const ctx = canvas.getContext('2d');
-    const opacitySlider = document.getElementById('opacitySlider');
 
-    let width = canvas.width = window.innerWidth;
-    let height = canvas.height = window.innerHeight;
+    <!-- MODAL 2: Accept Challenge Popup -->
+    <div id="acceptModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-brand-card border border-brand-border rounded-3xl max-w-md w-full p-6 shadow-2xl relative">
+            
+            <button onclick="closeModal('acceptModal')" class="absolute top-5 right-5 text-gray-400 hover:text-white w-8 h-8 rounded-full bg-brand-dark flex items-center justify-center transition-all">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
 
-    window.addEventListener('resize', () => {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
-        draw();
-    });
+            <div class="text-center mb-6">
+                <div class="w-14 h-14 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-3">
+                    <i class="fa-solid fa-swords"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">ตอบรับคำท้าแข่งขัน!</h3>
+                <p class="text-xs text-gray-400 mt-1" id="acceptModalSub">เตรียมพร้อมเข้าสู่สังเวียนการประลอง</p>
+            </div>
 
-    let points = {
-        cue: { x: width * 0.3, y: height * 0.6, radius: 35, color: '#ffffff', label: 'ลูกขาว' },
-        target: { x: width * 0.6, y: height * 0.4, radius: 35, color: '#ff4d4d', label: 'ลูกเป้า' },
-        pocket: { x: width * 0.85, y: height * 0.2, radius: 35, color: '#ffcc00', label: 'หลุม' }
-    };
+            <form id="acceptForm" onsubmit="handleAcceptChallenge(event)" class="space-y-4 text-sm">
+                <input type="hidden" id="acceptTargetPostId">
+                
+                <div>
+                    <label class="block text-gray-300 font-medium mb-1.5">ชื่อของคุณ / Gamertag ผู้ท้าชิง <span class="text-rose-500">*</span></label>
+                    <input type="text" id="challengerName" required placeholder="เช่น ShadowNinja หรือ กอล์ฟ" 
+                        class="w-full px-3.5 py-2.5 bg-brand-dark border border-brand-border rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500">
+                </div>
 
-    let activePoint = null;
+                <div>
+                    <label class="block text-gray-300 font-medium mb-1.5">ช่องทางติดต่อของคุณ <span class="text-rose-500">*</span></label>
+                    <input type="text" id="challengerContact" required placeholder="เช่น Line ID, Facebook, เบอร์โทร" 
+                        class="w-full px-3.5 py-2.5 bg-brand-dark border border-brand-border rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500">
+                </div>
 
-    function getPos(e) {
-        const rect = canvas.getBoundingClientRect();
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        return {
-            x: clientX - rect.left,
-            y: clientY - rect.top
-        };
-    }
+                <div class="pt-2">
+                    <button type="submit" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-teal-600 hover:to-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-900/40 transition-all">
+                        ⚔️ ยืนยันการรับคำท้า (ล็อกสิทธิ์)
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-    function onStart(e) {
-        const pos = getPos(e);
-        // เช็คว่านิ้วแตะโดนจุดไหน (ขยายโซนสัมผัสให้กว้างขึ้นมากๆ เพื่อให้กดติดง่าย)
-        for (let key in points) {
-            let pt = points[key];
-            let dist = Math.hypot(pos.x - pt.x, pos.y - pt.y);
-            if (dist < 60) { // รัศมีการกดกว้างถึง 60 พิกเซล จิ้มง่ายแน่นอน
-                activePoint = key;
-                break;
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Sample Initial Posts Data
+        const SAMPLE_POSTS = [
+            {
+                id: 'post-1',
+                author: 'SlayerX_TH',
+                game: 'RoV',
+                mode: '1v1 (ดวลเดี่ยว)',
+                criteria: 'แร็งค์ Commander ขึ้นไป (เลนกลางเท่านั้น)',
+                reward: '300 คูปอง (100 บาท)',
+                contact: 'FB: Somchai ProGamer / Discord: SlayerX#1234',
+                details: 'ดวลกัน 1v1 เลนกลาง ป้อมแรกแตกถือว่าแพ้ ห้ามฟาร์มป่า แข่งจบโอนทันที',
+                status: 'open', // 'open' or 'full'
+                challenger: null,
+                challengerContact: null,
+                createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString() // 30 mins ago
+            },
+            {
+                id: 'post-2',
+                author: 'พี่กิต สายเตะ',
+                game: 'ฟุตซอล (หญ้าเทียม)',
+                mode: '5v5 (ทีม)',
+                criteria: 'วัยรุ่นสายชิล ไม่ตอดไม่แถม เล่นกระชับมิตร',
+                reward: 'หารค่าสนาม 50/50 + น้ำอัดลม 1 ลัง',
+                contact: 'Line ID: kit_footsal / Tel: 081-999-XXXX',
+                details: 'ต้องการ 1 ทีมมาเตะกระชับมิตร คืนนี้ 20:00-22:00 น. สนาม Futsal Arena ห้วยขวาง',
+                status: 'full',
+                challenger: 'ทีม FC ชะอมทอง',
+                challengerContact: 'Line: team_chaom',
+                createdAt: new Date(Date.now() - 1000 * 60 * 120).toISOString() // 2 hrs ago
+            },
+            {
+                id: 'post-3',
+                author: 'ViperAim_99',
+                game: 'VALORANT',
+                mode: '5v5 (ทีม)',
+                criteria: 'แร็งค์ Diamond - Ascendant',
+                reward: '500 บาท / ทีม',
+                contact: 'Discord: ViperAim#5555',
+                details: 'หาทีมซ้อม Custom BO3 ด่าน Haven / Ascent ซ้อมแผนแข่งเสาร์นี้',
+                status: 'open',
+                challenger: null,
+                challengerContact: null,
+                createdAt: new Date(Date.now() - 1000 * 60 * 240).toISOString()
+            },
+            {
+                id: 'post-4',
+                author: 'น้องหมิว แบดมินตัน',
+                game: 'แบดมินตัน',
+                mode: '2v2 (ดวลคู่)',
+                criteria: 'มือ N / มือ S- (มือนกกา / มือเริ่มต้น)',
+                reward: 'คนแพ้จ่ายค่าก๊วน + ค่าคอร์ด',
+                contact: 'Line: miew_badminton',
+                details: 'หาคู่ตีแบด พรุ่งนี้ 18:00 น. คอร์ด B-Beat ลาดพร้าว มีลูกแบดให้พร้อม',
+                status: 'open',
+                challenger: null,
+                challengerContact: null,
+                createdAt: new Date(Date.now() - 1000 * 60 * 360).toISOString()
+            }
+        ];
+
+        // Global State
+        let posts = [];
+        let currentStatusFilter = 'all';
+
+        // Initialize App
+        window.addEventListener('DOMContentLoaded', () => {
+            loadPosts();
+        });
+
+        // Load posts from LocalStorage or seed with SAMPLE_POSTS
+        function loadPosts() {
+            const localData = localStorage.getItem('arena_match_posts');
+            if (localData) {
+                try {
+                    posts = JSON.parse(localData);
+                } catch (e) {
+                    posts = [...SAMPLE_POSTS];
+                }
+            } else {
+                posts = [...SAMPLE_POSTS];
+                savePosts();
+            }
+            renderPosts();
+        }
+
+        // Save current posts state to LocalStorage
+        function savePosts() {
+            localStorage.setItem('arena_match_posts', JSON.stringify(posts));
+        }
+
+        // Reset to initial sample data
+        function resetSampleData() {
+            if (confirm('คุณต้องการรีเซ็ตข้อมูลกลับเป็นรายการตัวอย่างเริ่มต้นหรือไม่?')) {
+                posts = [...SAMPLE_POSTS];
+                savePosts();
+                renderPosts();
             }
         }
-    }
 
-    function onMove(e) {
-        if (!activePoint) return;
-        e.preventDefault();
-        const pos = getPos(e);
-        points[activePoint].x = pos.x;
-        points[activePoint].y = pos.y;
-        draw();
-    }
+        // Render Posts Cards Grid
+        function renderPosts() {
+            const grid = document.getElementById('postsGrid');
+            const emptyState = document.getElementById('emptyState');
+            const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
 
-    function onEnd() {
-        activePoint = null;
-    }
+            grid.innerHTML = '';
 
-    // รองรับทั้งเมาส์และนิ้วมือทัชสกรีนแบบเต็มระบบ
-    canvas.addEventListener('mousedown', onStart);
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onEnd);
-    
-    canvas.addEventListener('touchstart', onStart, { passive: false });
-    window.addEventListener('touchmove', onMove, { passive: false });
-    window.addEventListener('touchend', onEnd);
+            // Filter logic
+            const filteredPosts = posts.filter(post => {
+                // Status Filter
+                if (currentStatusFilter !== 'all' && post.status !== currentStatusFilter) {
+                    return false;
+                }
+                // Search Text Filter (Matches game, author, criteria, mode)
+                if (searchVal !== '') {
+                    const matchGame = post.game.toLowerCase().includes(searchVal);
+                    const matchAuthor = post.author.toLowerCase().includes(searchVal);
+                    const matchCriteria = post.criteria.toLowerCase().includes(searchVal);
+                    const matchMode = post.mode.toLowerCase().includes(searchVal);
+                    return matchGame || matchAuthor || matchCriteria || matchMode;
+                }
+                return true;
+            });
 
-    opacitySlider.addEventListener('input', draw);
+            // Update Header Stats
+            document.getElementById('statTotal').innerText = posts.length;
+            document.getElementById('statOpen').innerText = posts.filter(p => p.status === 'open').length;
+            document.getElementById('statFull').innerText = posts.filter(p => p.status === 'full').length;
 
-    function draw() {
-        ctx.clearRect(0, 0, width, height);
-        ctx.globalAlpha = parseFloat(opacitySlider.value);
+            if (filteredPosts.length === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                
+                filteredPosts.forEach(post => {
+                    const isOpen = post.status === 'open';
+                    const timeAgo = getRelativeTime(post.createdAt);
 
-        const { cue, target, pocket } = points;
+                    const card = document.createElement('div');
+                    card.className = `bg-brand-card border ${isOpen ? 'border-brand-border hover:border-brand-purple/60' : 'border-rose-900/40'} rounded-3xl p-5 sm:p-6 flex flex-col justify-between transition-all duration-300 shadow-xl relative overflow-hidden group`;
 
-        // คำนวณ Ghost Ball
-        const angleTargetToPocket = Math.atan2(pocket.y - target.y, pocket.x - target.x);
-        const ballRadius = 22; 
-        
-        const ghostX = target.x - Math.cos(angleTargetToPocket) * (ballRadius * 2);
-        const ghostY = target.y - Math.sin(angleTargetToPocket) * (ballRadius * 2);
+                    card.innerHTML = `
+                        <!-- Status Glow Line -->
+                        <div class="absolute top-0 left-0 right-0 h-1.5 ${isOpen ? 'bg-gradient-to-r from-cyan-400 to-emerald-400' : 'bg-gradient-to-r from-rose-500 to-red-700'}"></div>
 
-        // 1. เส้นประลูกขาวไปกระทบลูกเป้า (Ghost Ball)
-        ctx.beginPath();
-        ctx.moveTo(cue.x, cue.y);
-        ctx.lineTo(ghostX, ghostY);
-        ctx.strokeStyle = '#00f2fe';
-        ctx.lineWidth = 4;
-        ctx.setLineDash([8, 6]);
-        ctx.stroke();
+                        <div>
+                            <!-- Top Info Header -->
+                            <div class="flex items-center justify-between mb-3 pt-1">
+                                <span class="text-xs text-gray-400 flex items-center gap-1.5">
+                                    <i class="fa-regular fa-clock"></i> ${timeAgo}
+                                </span>
+                                <!-- Status Badge -->
+                                ${isOpen ? `
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                        เปิดรับผู้ท้าชิง
+                                    </span>
+                                ` : `
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-500/10 text-rose-400 border border-rose-500/30">
+                                        <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                                        ได้คู่แข่งแล้ว (เต็ม)
+                                    </span>
+                                `}
+                            </div>
 
-        // 2. เส้นยาวพุ่งทะลุหลุม
-        const longDist = 3000;
-        const lineEndX = target.x + Math.cos(angleTargetToPocket) * longDist;
-        const lineEndY = target.y + Math.sin(angleTargetToPocket) * longDist;
+                            <!-- Title Game & Mode -->
+                            <div class="mb-4">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-xl font-bold text-white group-hover:text-cyan-300 transition-colors">
+                                        ${escapeHTML(post.game)}
+                                    </h3>
+                                    <span class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-brand-dark border border-brand-border text-purple-300">
+                                        ${escapeHTML(post.mode)}
+                                    </span>
+                                </div>
+                                <p class="text-xs text-gray-400 mt-1">
+                                    <i class="fa-solid fa-user-ninja text-purple-400 mr-1"></i> โพสต์โดย: <span class="text-gray-200 font-medium">${escapeHTML(post.author)}</span>
+                                </p>
+                            </div>
 
-        ctx.beginPath();
-        ctx.moveTo(target.x, target.y);
-        ctx.lineTo(lineEndX, lineEndY);
-        ctx.strokeStyle = '#39ff14';
-        ctx.lineWidth = 5;
-        ctx.setLineDash([]);
-        ctx.stroke();
+                            <!-- Match Details Box -->
+                            <div class="bg-brand-dark/70 rounded-2xl p-4 border border-brand-border/60 space-y-2.5 text-xs sm:text-sm mb-4">
+                                <!-- Criteria -->
+                                <div class="flex items-start space-x-2">
+                                    <i class="fa-solid fa-shield-halved text-cyan-400 mt-0.5"></i>
+                                    <div>
+                                        <span class="text-gray-400 font-medium">เวท/คุณลักษณะผู้แข่ง:</span>
+                                        <span class="text-gray-200 font-semibold block sm:inline">${escapeHTML(post.criteria)}</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Reward / Bet -->
+                                <div class="flex items-start space-x-2">
+                                    <i class="fa-solid fa-trophy text-amber-400 mt-0.5"></i>
+                                    <div>
+                                        <span class="text-gray-400 font-medium">รางวัล/เดิมพัน:</span>
+                                        <span class="text-amber-300 font-bold block sm:inline">${escapeHTML(post.reward)}</span>
+                                    </div>
+                                </div>
 
-        // 3. วงกลม Ghost Ball
-        ctx.beginPath();
-        ctx.arc(ghostX, ghostY, ballRadius, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
-        ctx.lineWidth = 2;
-        ctx.setLineDash([4, 4]);
-        ctx.stroke();
+                                <!-- Contact -->
+                                <div class="flex items-start space-x-2">
+                                    <i class="fa-solid fa-address-card text-purple-400 mt-0.5"></i>
+                                    <div>
+                                        <span class="text-gray-400 font-medium">ติดต่อผู้โพสต์:</span>
+                                        <span class="text-purple-200 font-mono block sm:inline">${escapeHTML(post.contact)}</span>
+                                    </div>
+                                </div>
 
-        // 4. วาดปุ่มวงกลมควบคุม (ทำปุ่มให้ใหญ่สะใจ จิ้มลากง่าย)
-        for (let key in points) {
-            const pt = points[key];
-            
-            // วงแหวนเรืองแสงรอบนอก
-            ctx.beginPath();
-            ctx.arc(pt.x, pt.y, pt.radius, 0, Math.PI * 2);
-            ctx.fillStyle = pt.color;
-            ctx.shadowColor = pt.color;
-            ctx.shadowBlur = 15;
-            ctx.fill();
-            ctx.shadowBlur = 0;
+                                <!-- Extra Note -->
+                                ${post.details ? `
+                                    <div class="pt-2 border-t border-gray-800 text-gray-400 text-xs italic">
+                                        "${escapeHTML(post.details)}"
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
 
-            // ขอบนอกสีดำตัดขอบให้ชัดเจน
-            ctx.lineWidth = 3;
-            ctx.strokeStyle = '#000000';
-            ctx.stroke();
+                        <!-- Card Bottom Action / Challenger Status -->
+                        <div>
+                            ${isOpen ? `
+                                <button onclick="openAcceptModal('${post.id}', '${escapeHTML(post.game)}')" 
+                                    class="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-teal-600 hover:to-emerald-500 text-white font-bold rounded-2xl shadow-lg shadow-emerald-950/40 transition-all flex items-center justify-center space-x-2 transform active:scale-95">
+                                    <i class="fa-solid fa-fire"></i>
+                                    <span>🔥 รับคำท้า / ตอบรับแข่ง</span>
+                                </button>
+                            ` : `
+                                <div class="bg-rose-950/30 border border-rose-800/40 rounded-2xl p-3 text-xs">
+                                    <div class="text-rose-400 font-semibold flex items-center justify-between">
+                                        <span>⚔️ ผู้ตอบรับคำท้า:</span>
+                                        <span class="bg-rose-900/60 text-white px-2 py-0.5 rounded text-[10px]">MATCHED</span>
+                                    </div>
+                                    <div class="text-white font-bold mt-1 text-sm">${escapeHTML(post.challenger || 'มีผู้รับคำท้าแล้ว')}</div>
+                                    <div class="text-gray-400 text-[11px] mt-0.5">ติดต่อ: ${escapeHTML(post.challengerContact || '-')}</div>
+                                </div>
+                            `}
+                        </div>
+                    `;
 
-            // ตัวหนังสือบอกชื่อ
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 14px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText(pt.label, pt.x, pt.y - pt.radius - 8);
+                    grid.appendChild(card);
+                });
+            }
         }
-    }
 
-    function resetPoints() {
-        points.cue = { x: width * 0.3, y: height * 0.6, radius: 35, color: '#ffffff', label: 'ลูกขาว' };
-        points.target = { x: width * 0.6, y: height * 0.4, radius: 35, color: '#ff4d4d', label: 'ลูกเป้า' };
-        points.pocket = { x: width * 0.85, y: height * 0.2, radius: 35, color: '#ffcc00', label: 'หลุม' };
-        draw();
-    }
+        // Filter Handlers
+        function setStatusFilter(status) {
+            currentStatusFilter = status;
+            
+            // UI tab toggle
+            document.getElementById('btnFilterAll').className = status === 'all' ? 'px-4 py-1.5 rounded-lg transition-all bg-brand-purple text-white' : 'px-4 py-1.5 rounded-lg transition-all text-gray-400 hover:text-white';
+            document.getElementById('btnFilterOpen').className = status === 'open' ? 'px-4 py-1.5 rounded-lg transition-all bg-emerald-600 text-white' : 'px-4 py-1.5 rounded-lg transition-all text-gray-400 hover:text-white';
+            document.getElementById('btnFilterFull').className = status === 'full' ? 'px-4 py-1.5 rounded-lg transition-all bg-rose-600 text-white' : 'px-4 py-1.5 rounded-lg transition-all text-gray-400 hover:text-white';
 
-    draw();
-</script>
+            renderPosts();
+        }
+
+        function applyFilters() {
+            renderPosts();
+        }
+
+        // Create New Post Handler
+        function handleCreatePost(e) {
+            e.preventDefault();
+
+            const newPost = {
+                id: 'post-' + Date.now(),
+                author: document.getElementById('postAuthor').value.trim(),
+                game: document.getElementById('postGame').value.trim(),
+                mode: document.getElementById('postMode').value,
+                criteria: document.getElementById('postCriteria').value.trim(),
+                reward: document.getElementById('postReward').value.trim(),
+                contact: document.getElementById('postContact').value.trim(),
+                details: document.getElementById('postDetails').value.trim(),
+                status: 'open',
+                challenger: null,
+                challengerContact: null,
+                createdAt: new Date().toISOString()
+            };
+
+            posts.unshift(newPost); // add to top
+            savePosts();
+            renderPosts();
+
+            // Reset form and close modal
+            document.getElementById('createPostForm').reset();
+            closeModal('createPostModal');
+        }
+
+        // Open Accept Challenge Modal
+        function openAcceptModal(postId, gameTitle) {
+            document.getElementById('acceptTargetPostId').value = postId;
+            document.getElementById('acceptModalSub').innerText = `เกม/กีฬา: ${gameTitle}`;
+            openModal('acceptModal');
+        }
+
+        // Handle Accepting Challenge
+        function handleAcceptChallenge(e) {
+            e.preventDefault();
+
+            const postId = document.getElementById('acceptTargetPostId').value;
+            const challengerName = document.getElementById('challengerName').value.trim();
+            const challengerContact = document.getElementById('challengerContact').value.trim();
+
+            const postIndex = posts.findIndex(p => p.id === postId);
+            if (postIndex !== -1) {
+                posts[postIndex].status = 'full';
+                posts[postIndex].challenger = challengerName;
+                posts[postIndex].challengerContact = challengerContact;
+
+                savePosts();
+                renderPosts();
+            }
+
+            document.getElementById('acceptForm').reset();
+            closeModal('acceptModal');
+        }
+
+        // Modal Helpers
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        // Utility: Escape HTML to prevent XSS
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str.replace(/[&<>'"]/g, 
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag] || tag)
+            );
+        }
+
+        // Utility: Relative time string
+        function getRelativeTime(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffInSeconds = Math.floor((now - date) / 1000);
+
+            if (diffInSeconds < 60) return 'เมื่อสักครู่';
+            if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} นาทีที่แล้ว`;
+            if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} ชั่วโมงที่แล้ว`;
+            return `${Math.floor(diffInSeconds / 86400)} วันที่แล้ว`;
+        }
+    </script>
 </body>
 </html>
